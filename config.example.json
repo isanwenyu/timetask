@@ -1,16 +1,17 @@
 {
-  "command_prefix": "$time",
+  "command_prefix": "time",
   "debug": false,
   "time_check_rate": 1,
   "is_open_extension_function": true,
-  "extension_function": [
+  "extension_function":
+  [
     {
       "key_word": "早报",
-      "func_command_prefix": "$tool "
+      "func_command_prefix":"tool "
     },
     {
       "key_word": "点歌",
-      "func_command_prefix": "$"
+      "func_command_prefix": ""
     },
     {
       "key_word": "搜索",

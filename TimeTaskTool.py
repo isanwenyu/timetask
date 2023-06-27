@@ -7,7 +7,7 @@ import time
 import arrow
 import threading
 from typing import List
-from plugins.timetask.config import conf, load_config
+from plugins.timetask.plugin_config import plugin_conf, load_config
 from lib import itchat
 from lib.itchat.content import *
 
@@ -31,7 +31,7 @@ class TaskManager(object):
         
         #配置加载
         load_config()
-        self.conf = conf()
+        self.conf = plugin_conf()
         self.debug = self.conf.get("debug", False)
         #迁移任务的时间
         self.move_historyTask_time = self.conf.get("move_historyTask_time", "04:00:00")

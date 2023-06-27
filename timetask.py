@@ -7,7 +7,7 @@ import logging
 from plugins import *
 import logging
 from plugins.timetask.TimeTaskTool import TaskManager
-from plugins.timetask.config import conf, load_config
+from plugins.timetask.plugin_config import plugin_conf, load_config
 from plugins.timetask.Tool import TimeTaskModel
 from lib import itchat
 from lib.itchat.content import *
@@ -15,6 +15,7 @@ import re
 import arrow
 from plugins.timetask.Tool import ExcelTool
 from bridge.bridge import Bridge
+from config import conf as root_config
 
 class TimeTaskRemindType(Enum):
     NO_Task = 1           #无任务
@@ -25,6 +26,8 @@ class TimeTaskRemindType(Enum):
     TaskList_Success = 6  #查看任务列表成功
     TaskList_Failed = 7   #查看任务列表失败
 
+trigger_prefix="$" #全局变量
+
 @plugins.register(
     name="timetask",
     desire_priority=500,
@@ -33,16 +36,17 @@ class TimeTaskRemindType(Enum):
     version="0.1",
     author="haikerwang",
 )
-    
-class timetask(Plugin):
-    
+class TimeTask(Plugin):
     def __init__(self):
         super().__init__()
         self.handlers[Event.ON_HANDLE_CONTEXT] = self.on_handle_context
         print("[timetask] inited")
         load_config()
-        self.conf = conf()
+        self.conf = plugin_conf()
         self.taskManager = TaskManager(self.runTimeTask)
+        #修改全局变量，需要使用global关键字声明
+        global trigger_prefix
+        trigger_prefix = root_config().get("plugin_trigger_prefix", "$")
         
     def on_handle_context(self, e_context: EventContext):
         if e_context["context"].type not in [
@@ -53,15 +57,16 @@ class timetask(Plugin):
         #查询内容
         query = e_context["context"].content
         logging.info("定时任务的输入信息为:{}".format(query))
-        #指令前缀
-        command_prefix = self.conf.get("command_prefix", "$time")
         
-        #需要的格式：$time 时间 事件
+        #指令前缀
+        command_prefix = trigger_prefix + self.conf.get("command_prefix", "time")
+        
+        #需要的格式：{trigger_prefix}time 时间 事件
         if query.startswith(command_prefix) :
             #处理任务
             print("[timetask] 捕获到定时任务:{}".format(query))
             #移除指令
-            #示例：$time 明天 十点十分 提醒我健身
+            #示例：{trigger_prefix}time 明天 十点十分 提醒我健身
             content = query.replace(f"{command_prefix} ", "")
             content = content.replace(command_prefix, "")
             self.deal_timeTask(content, e_context)
@@ -254,7 +259,7 @@ class timetask(Plugin):
             isGPT = False
             for item in funcArray:
               key_word = item["key_word"]
-              func_command_prefix = item["func_command_prefix"]
+              func_command_prefix = trigger_prefix + item["func_command_prefix"]
               #匹配到了拓展功能
               isFindExFuc = False
               if event_content.startswith(key_word):
@@ -320,10 +325,11 @@ class timetask(Plugin):
     def get_default_remind(self, currentType: TimeTaskRemindType):
         #head
         head = "\n\n【温馨提示】\n"
-        addTask = "👉添加任务：$time 明天 十点十分 提醒我健身" + "\n"
-        addGPTTask = "👉GPT任务：$time 明天 十点十分 GPT 夸夸我" + "\n"
-        cancelTask = "👉取消任务：$time 取消任务 任务ID" + "\n"
-        taskList = "👉任务列表：$time 任务列表" + "\n"
+
+        addTask = f"👉添加任务：{trigger_prefix}time 明天 十点十分 提醒我健身" + "\n"
+        addGPTTask = f"👉GPT任务：{trigger_prefix}time 明天 十点十分 GPT 夸夸我" + "\n"
+        cancelTask = f"👉取消任务：{trigger_prefix}time 取消任务 任务ID" + "\n"
+        taskList = f"👉任务列表：{trigger_prefix}time 任务列表" + "\n"
         more = "👉更多功能：#help timetask"
         
         # NO_Task = 1           #无任务
@@ -368,23 +374,23 @@ class timetask(Plugin):
     #help信息
     def get_help_text(self, **kwargs):
         h_str = "🎉功能一：添加定时任务\n"
-        codeStr = "【指令】：$time 周期 时间 事件\n"
+        codeStr = f"【指令】：{trigger_prefix}time 周期 时间 事件\n"
         circleStr = "【周期支持】：今天、明天、后天、每天、工作日、每周X（如：每周三）、YYYY-MM-DD的日期\n"
         timeStr = "【时间支持】：X点X分（如：十点十分）、HH:mm:ss的时间\n"
-        enventStr = "【事件支持】：早报、点歌、搜索、GPT、文案提醒（如：提醒我健身）\n"
-        exampleStr = "\n👉示例：$time 明天 十点十分 提醒我健身\n"
-        exampleStr0 = "👉示例：$time 明天 十点十分 GPT 夸夸我\n\n\n"
+        enventStr = "【事件支持】：早报、点歌、搜索、文案提醒（如：提醒我健身）\n"
+        exampleStr = f"\n👉示例：{trigger_prefix}time 明天 十点十分 提醒我健身\n"
+        exampleStr0 = f"👉示例：{trigger_prefix}time 明天 十点十分 GPT 夸夸我\n\n\n"
         tempStr = h_str + codeStr + circleStr + timeStr + enventStr + exampleStr + exampleStr0
         
         h_str1 = "🎉功能二：取消定时任务\n"
-        codeStr1 = "【指令】：$time 取消任务 任务ID\n"
+        codeStr1 = f"【指令】：{trigger_prefix}time 取消任务 任务ID\n"
         taskId1 = "【任务ID】：任务ID（添加任务成功时，机器人回复中有）\n"
-        exampleStr1 = "\n👉示例：$time 取消任务 urwOi0he\n\n\n"
+        exampleStr1 = f"\n👉示例：{trigger_prefix}time 取消任务 urwOi0he\n\n\n"
         tempStr1 = h_str1 + codeStr1 + taskId1 + exampleStr1
         
         h_str2 = "🎉功能三：获取任务列表\n"
-        codeStr2 = "【指令】：$time 任务列表\n"
-        exampleStr2 = "\n👉示例：$time 任务列表\n\n\n"
+        codeStr2 = f"【指令】：{trigger_prefix}time 任务列表\n"
+        exampleStr2 = f"\n👉示例：{trigger_prefix}time 任务列表\n\n\n"
         tempStr2 = h_str2 + codeStr2 + exampleStr2
         
         headStr = "📌 功能介绍：添加定时任务、取消定时任务、获取任务列表。\n\n"
