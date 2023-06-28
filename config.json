@@ -7,6 +7,14 @@
   "extension_function":
   [
     {
+      "key_word": "总结",
+      "func_command_prefix":"summary "
+    },
+    {
+      "key_word": "工具",
+      "func_command_prefix":"tool "
+    },
+    {
       "key_word": "早报",
       "func_command_prefix":"tool "
     },
