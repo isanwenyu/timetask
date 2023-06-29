@@ -7,12 +7,12 @@
   "extension_function":
   [
     {
-      "key_word": "总结",
-      "func_command_prefix":"summary "
+      "key_word": "总结消息",
+      "func_command_prefix":"总结 "
     },
     {
-      "key_word": "工具",
-      "func_command_prefix":"tool "
+      "key_word": "天气",
+      "func_command_prefix":"tool meteo-weather "
     },
     {
       "key_word": "早报",
