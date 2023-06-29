@@ -64,7 +64,7 @@ class TimeTask(Plugin):
         #需要的格式：{trigger_prefix}time 时间 事件
         if query.startswith(command_prefix) :
             #处理任务
-            print("[timetask] 捕获到定时任务:{}".format(query))
+            logging.info("[TimeTask] 捕获到定时任务:{}".format(query))
             #移除指令
             #示例：{trigger_prefix}time 明天 十点十分 提醒我健身
             content = query.replace(f"{command_prefix} ", "")
@@ -237,7 +237,7 @@ class TimeTask(Plugin):
     #执行定时task
     def runTimeTask(self, model: TimeTaskModel):
         
-        print("触发了定时任务：{} , 任务详情：{}".format(model.taskId, model.eventStr))
+        logging.info("触发了定时任务：{} , 任务详情：{}".format(model.taskId, model.eventStr))
         
         #去除多余字符串
         orgin_string = model.originMsg.replace("ChatMessage:", "")
