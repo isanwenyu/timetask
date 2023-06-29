@@ -377,7 +377,7 @@ class TimeTask(Plugin):
         codeStr = f"【指令】：{trigger_prefix}time 周期 时间 事件\n"
         circleStr = "【周期支持】：今天、明天、后天、每天、工作日、每周X（如：每周三）、YYYY-MM-DD的日期\n"
         timeStr = "【时间支持】：X点X分（如：十点十分）、HH:mm:ss的时间\n"
-        enventStr = "【事件支持】：早报、点歌、搜索、文案提醒（如：提醒我健身）\n"
+        enventStr = "【事件支持】：早报、点歌、搜索、GPT、文案提醒（如：提醒我健身）\n"
         exampleStr = f"\n👉示例：{trigger_prefix}time 明天 十点十分 提醒我健身\n"
         exampleStr0 = f"👉示例：{trigger_prefix}time 明天 十点十分 GPT 夸夸我\n\n\n"
         tempStr = h_str + codeStr + circleStr + timeStr + enventStr + exampleStr + exampleStr0
