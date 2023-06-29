@@ -259,12 +259,12 @@ class TimeTask(Plugin):
             isGPT = False
             for item in funcArray:
               key_word = item["key_word"]
-              func_command_prefix = trigger_prefix + item["func_command_prefix"]
+              func_command_prefix = item["func_command_prefix"]
               #匹配到了拓展功能
               isFindExFuc = False
               if event_content.startswith(key_word):
                 index = event_content.find(key_word)
-                insertStr = func_command_prefix + key_word 
+                insertStr = trigger_prefix + func_command_prefix + key_word 
                 if func_command_prefix == "GPT":
                       isGPT = True
                       insertStr = ""
